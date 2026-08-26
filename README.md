@@ -30,6 +30,7 @@ waydroid show-full-ui &
 
 | Guide | Description |
 |:---|:---|
+| 📋 [**Complete Operational Cheat Sheet**](WAYDROID_CHEATSHEET.md) | **Fast copy-paste reference for start/stop lifecycle, app management, resolution, networking, storage paths, and shell aliases.** |
 | 📖 [**Kernel & BinderFS Setup**](docs/01_ARCH_LINUX_KERNEL_BINDERFS.md) | Arch Linux BinderFS nodes (`/dev/binderfs/anbox-*`), udev rules, permissions, and systemd tmpfiles. |
 | 🛠️ [**LXC 7 Compatibility & Code Patches**](docs/02_LXC7_WAYDROID_COMPATIBILITY.md) | Resolving LXC 7 relative path enforcement, tmpfs mount type fixes, and patching `lxc.py`. |
 | ⚙️ [**ARM64 Translation (`libndk` / `libhoudini`)**](docs/03_ARM64_TRANSLATION_LIBNDK.md) | Running native ARM64 games and apps on x86_64 AMD/Intel CPUs. |

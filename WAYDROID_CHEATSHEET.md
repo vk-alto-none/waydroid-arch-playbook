@@ -122,33 +122,73 @@ waydroid prop set persist.waydroid.suspend false
 
 ---
 
-## 📦 6. App Installation & Management
+## 📦 6. HOW TO INSTALL APKS ON WAYDROID (Path, CLI & Stores)
 
-### 👤 User `vikas` (Regular User):
+### 🚀 Method 1: Install from Linux Local File Path (Fastest CLI)
+*Run this in your normal terminal as user `vikas` (NO sudo needed):*
 ```bash
-# Install local APK file
-waydroid app install ~/Downloads/app.apk
+# Syntax:
+waydroid app install <path_to_apk>
 
-# Download & Sideload APK directly
-curl -L -o /tmp/app.apk "<url>" && waydroid app install /tmp/app.apk
+# Examples:
+waydroid app install /home/vikas/Downloads/my_game.apk
+waydroid app install ~/Downloads/WhatsApp.apk
+waydroid app install ./game.apk
 
-# Launch installed app by package name
-waydroid app launch <package_name>
-# Example: waydroid app launch com.apkpure.aegon
-
-# List all installed apps
-waydroid app list
+# 💡 Dolphin File Manager Trick:
+# Type "waydroid app install " in terminal (with space), drag & drop the .apk file from Dolphin into terminal, and press Enter!
 ```
 
-### 👑 Superuser / Root (`root` / `su`):
-```bash
-# Grant app runtime permissions (Storage, Audio, etc.)
-waydroid shell pm grant <package_name> android.permission.RECORD_AUDIO
-waydroid shell pm grant <package_name> android.permission.READ_EXTERNAL_STORAGE
+---
 
-# Force uninstall an app
-waydroid shell pm uninstall <package_name>
+### 🌐 Method 2: Direct URL Download & Install in 1-Line
+```bash
+# Downloads and installs any APK directly from the internet:
+curl -L -A "Mozilla/5.0 (Android; Mobile)" -o /tmp/app.apk "<DIRECT_APK_URL>" && waydroid app install /tmp/app.apk
 ```
+
+---
+
+### 📂 Method 3: Copy to Android Shared Storage (Install via GUI)
+```bash
+# Copy APK directly into Android's internal Download folder:
+cp ~/Downloads/my_app.apk ~/.local/share/waydroid/data/media/0/Download/
+
+# Then inside Waydroid: Open "Files" or "APKPure" app -> Downloads -> Tap on APK to Install.
+```
+
+---
+
+### 🏪 Method 4: 1-Click Install via In-App Store (APKPure / F-Droid)
+- Open **APKPure** or **F-Droid** on your Waydroid screen.
+- Search for any app (e.g. *Free Fire, WhatsApp, Telegram, Via Browser*).
+- Click **Install** $\to$ APKPure automatically downloads and extracts APK + OBB data with zero manual effort!
+
+---
+
+### 🎮 Method 5: Large 2GB+ Games with OBB Files (.xapk / .zip)
+```bash
+# 1. Rename .xapk to .zip and extract:
+unzip game.xapk -d /tmp/game_extracted/
+
+# 2. Install base APK:
+waydroid app install /tmp/game_extracted/*.apk
+
+# 3. Stage OBB Data files into Waydroid storage:
+mkdir -p ~/.local/share/waydroid/data/media/0/Android/obb/<package_name>/
+cp /tmp/game_extracted/Android/obb/<package_name>/*.obb ~/.local/share/waydroid/data/media/0/Android/obb/<package_name>/
+```
+
+---
+
+### 📋 App Management Commands
+
+| Task | Privilege | Command / Example |
+|:---|:---|:---|
+| **Launch Installed App** | **User `vikas`** | `waydroid app launch <package_name>` *(e.g. `waydroid app launch com.apkpure.aegon`)* |
+| **List All Installed Apps** | **User `vikas`** | `waydroid app list` |
+| **Grant App Permissions** | **Superuser (`sudo`)** | `sudo waydroid shell pm grant <pkg> android.permission.RECORD_AUDIO`<br>`sudo waydroid shell pm grant <pkg> android.permission.READ_EXTERNAL_STORAGE` |
+| **Force Uninstall App** | **Superuser (`sudo`)** | `sudo waydroid shell pm uninstall <pkg>` |
 
 ---
 

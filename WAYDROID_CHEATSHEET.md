@@ -46,18 +46,21 @@ systemctl stop waydroid-container.service
 
 ---
 
-## 🔄 3. CLEAN RESTART / HARD RESET
+## 🧭 3. ANDROID NAVIGATION & KEYBOARD SHORTCUTS
 
-### 👑 Terminal 1: Superuser / Root
-```bash
-systemctl restart waydroid-container.service
-```
+| Action / Button | Keyboard Shortcut | Mouse Gesture | Description |
+|:---|:---|:---|:---|
+| **🏠 Go to Home Screen** | **`Windows Key` (Super / Meta)** or **`F1`** | Swipe UP from bottom edge | Instant return to Android home / launcher. |
+| **🔙 Go Back (Previous Screen)** | **`Esc` (Escape)** | **Right-Click** anywhere | Goes back one step or closes active menu. |
+| **📑 Recent Apps / Multitasking** | **`F2`** or **`Super + Tab`** | Swipe UP and hold | Shows all open background apps. |
+| **🔔 Pull Down Notification Bar** | **`F4`** | Drag DOWN from top edge | Shows notification shade & quick toggles. |
+| **💡 Wake up Screen (If Black/Blank)** | Press **`Space`** / Click Mouse | Left Click anywhere | Wakes Android from display timeout. |
 
-### 👤 Terminal 2: User `vikas`
+### 🛑 Prevent Android Screen from Going Blank / Sleeping:
 ```bash
-waydroid session start &
-sleep 2
-waydroid show-full-ui &
+# Run this once in terminal (fixes screen turning black after inactivity):
+sudo waydroid shell settings put system screen_off_timeout 2147483647
+sudo waydroid shell settings put global stay_on_while_plugged_in 3
 ```
 
 ---

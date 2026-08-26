@@ -12,3 +12,4 @@
 | `Waiting for binder Service Manager... Service Manager never appeared` | Container failed to start due to mount/permission error or binderfs mismatch. | Check `sudo waydroid log` and inspect `lxc-start` output in `/tmp/lxc_debug.log`. |
 | Container constantly entering `FROZEN` state | Waydroid default suspend policy freezes container on window blur. | Set `suspend_action = none` in `waydroid.cfg` and `persist.waydroid.suspend false`. |
 | `INSTALL_FAILED_NO_MATCHING_ABIS` | Attempting to install ARM64 APK on x86_64 CPU without translation. | Install `libndk` via `waydroid_script`. |
+| `Oops! An error occurred / No Internet in APKPure or Apps` | UFW firewall blocking routed forwarding (`DEFAULT_FORWARD_POLICY="DROP"`) or DNS stub issue. | Run `sudo ufw allow in on waydroid0`, enable MASQUERADE NAT, and set `waydroid prop set net.dns1 1.1.1.1`. |

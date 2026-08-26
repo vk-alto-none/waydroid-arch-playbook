@@ -1,0 +1,23 @@
+[waydroid]
+arch = x86_64
+vendor_type = MAINLINE
+system_datetime = 1712139720
+vendor_datetime = 1714338780
+suspend_action = none
+mount_overlays = True
+auto_adb = False
+images_path = /var/lib/waydroid/images
+binder = anbox-binder
+vndbinder = anbox-vndbinder
+hwbinder = anbox-hwbinder
+system_ota = https://ota.waydro.id/system/lineage/waydroid_x86_64/GAPPS.json
+vendor_ota = https://ota.waydro.id/vendor/waydroid_x86_64/MAINLINE.json
+binder_protocol = aidl3
+service_manager_protocol = aidl3
+
+[properties]
+ro.hardware.gralloc = gbm
+ro.hardware.egl = mesa
+gralloc.gbm.device = /dev/dri/renderD129
+persist.waydroid.suspend = false
+persist.waydroid.multi_windows = false

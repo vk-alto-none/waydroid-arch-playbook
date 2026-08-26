@@ -1,0 +1,8 @@
+SUBSYSTEM=="binder", MODE="0666"
+KERNEL=="binder-control", MODE="0666"
+KERNEL=="anbox-binder", MODE="0666"
+KERNEL=="anbox-hwbinder", MODE="0666"
+KERNEL=="anbox-vndbinder", MODE="0666"
+KERNEL=="binder", MODE="0666"
+KERNEL=="hwbinder", MODE="0666"
+KERNEL=="vndbinder", MODE="0666"

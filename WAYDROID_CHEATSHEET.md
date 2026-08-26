@@ -1,142 +1,197 @@
 # 📱 Waydroid Complete Operational Cheat Sheet
-<!-- Clear privilege separation: [Superuser / root] vs [Regular User] -->
+<!-- Separated by User Role: [SUPERUSER / ROOT] vs [REGULAR USER: vikas] -->
 
 ---
 
-## 🟢 1. START WAYDROID (Lifecycle Start)
+## 🟢 1. HOW TO START WAYDROID
 
-### 🚀 Method A: 1-Line Complete Start (Recommended)
+### 👑 Terminal 1: As Superuser / Root (`root` / `su`)
+*Run this in your Superuser terminal (or via root):*
 ```bash
-# Starts container daemon, initializes user session, and opens Android screen:
-sudo systemctl start waydroid-container && waydroid session start & sleep 2 && waydroid show-full-ui &
+# 1. Start the container background service
+systemctl start waydroid-container.service
+
+# (Optional: Check that container daemon is active)
+systemctl status waydroid-container.service
 ```
 
-### 🛠️ Method B: Step-by-Step Manual Start
+### 👤 Terminal 2: As Regular User (`vikas` — NO sudo)
+*Run this in your normal desktop terminal (with Wayland display):*
 ```bash
-# Step 1: Start Container Daemon [Superuser / root]
-sudo systemctl start waydroid-container.service
-
-# Step 2: Start Wayland User Session [Regular User - NO sudo]
+# 1. Start the Wayland user session in background
 waydroid session start &
 
-# Step 3: Open Android Tablet Screen [Regular User - NO sudo]
+# 2. Wait 2 seconds, then open the Android Tablet GUI
 waydroid show-full-ui &
 ```
 
 ---
 
-## 🔴 2. STOP WAYDROID (Lifecycle Stop)
+## 🔴 2. HOW TO STOP WAYDROID
 
-### 🛑 Method A: 1-Line Complete Stop (Recommended)
+### 👤 Terminal 2: As Regular User (`vikas` — NO sudo)
+*First close the graphical session:*
 ```bash
-# Closes UI, kills active session, and shuts down container daemon:
-waydroid session stop && sudo systemctl stop waydroid-container.service
-```
-
-### 🛠️ Method B: Step-by-Step Manual Stop
-```bash
-# Step 1: Close Active Android GUI Session [Regular User - NO sudo]
+# 1. Stop active Android session and close windows
 waydroid session stop
-# (or use custom helper: waydroid-exit)
-
-# Step 2: Stop Container Daemon in Background [Superuser / root]
-sudo systemctl stop waydroid-container.service
+# (or run: waydroid-exit)
 ```
 
-### 🔄 Method C: Clean Hard Reset / Restart
+### 👑 Terminal 1: As Superuser / Root (`root` / `su`)
+*Then shutdown the background daemon:*
 ```bash
-# Restart entire container and user session:
-sudo systemctl restart waydroid-container.service && sleep 2 && waydroid session start &
+# 2. Stop the container background service
+systemctl stop waydroid-container.service
 ```
 
 ---
 
-## 📊 3. Status & Diagnostics
+## 🔄 3. CLEAN RESTART / HARD RESET
 
-| Command | Privilege | Description |
-|:---|:---|:---|
-| `waydroid status` | **Regular User** | Check container, session, IP lease & Wayland display status. |
-| `sudo waydroid shell` | **Superuser (`sudo`)** | Open interactive Android root bash shell. |
-| `sudo waydroid logcat` | **Superuser (`sudo`)** | Stream live Android system & app logs. |
-| `sudo lxc-attach -P /var/lib/waydroid/lxc -n waydroid -- /system/bin/sh` | **Superuser (`sudo`)** | Direct low-level LXC root shell access. |
-| `cat /var/lib/waydroid/waydroid.log` | **Regular User / Read** | Inspect host Waydroid daemon log. |
+### 👑 Terminal 1: Superuser / Root
+```bash
+systemctl restart waydroid-container.service
+```
 
----
-
-## 🎮 4. Screen, Resolution & Window Management
-
-| Command / Action | Privilege | Description |
-|:---|:---|:---|
-| `waydroid-fullscreen` | **Regular User** | Toggle Fullscreen on/off instantly via KWin Wayland script. |
-| Press `Alt + F3` on window $\to$ *More Actions* $\to$ *Fullscreen* | **KDE GUI** | Native KDE Plasma window management. |
-| `waydroid prop set persist.waydroid.width 1920`<br>`waydroid prop set persist.waydroid.height 1080` | **Regular User** | Lock native 1080p display resolution. |
-| `waydroid prop set persist.waydroid.width 0`<br>`waydroid prop set persist.waydroid.height 0` | **Regular User** | Enable dynamic window auto-resize. |
-| `waydroid prop set persist.waydroid.multi_windows false` | **Regular User** | Single tablet window mode (ideal for games). |
-| `waydroid prop set persist.waydroid.multi_windows true` | **Regular User** | Multi-window mode (each app as independent Linux window). |
-| `waydroid prop set persist.waydroid.suspend false` | **Regular User** | Anti-Freeze / Anti-Sleep (keeps games running in background). |
+### 👤 Terminal 2: User `vikas`
+```bash
+waydroid session start &
+sleep 2
+waydroid show-full-ui &
+```
 
 ---
 
-## 📦 5. App Installation & Management
+## 📊 4. Status & Diagnostics
 
-| Task | Privilege | Command / Example |
-|:---|:---|:---|
-| **Install Local APK** | **Regular User** | `waydroid app install ~/Downloads/APKPure.apk` |
-| **Download & Install from URL** | **Regular User** | `curl -L -o /tmp/app.apk "<url>" && waydroid app install /tmp/app.apk` |
-| **Launch Installed App** | **Regular User** | `waydroid app launch com.apkpure.aegon` |
-| **List Installed Apps** | **Regular User** | `waydroid app list` |
-| **Grant App Permissions** | **Superuser (`sudo`)** | `sudo waydroid shell pm grant <pkg> <permission>` |
-| **Uninstall App** | **Superuser (`sudo`)** | `sudo waydroid shell pm uninstall <pkg>` |
+### 👤 User `vikas` (Regular User):
+```bash
+# Check live status (Container state, Session, IP address, Display)
+waydroid status
+
+# Inspect host daemon log file
+cat /var/lib/waydroid/waydroid.log
+```
+
+### 👑 Superuser / Root (`root` / `su`):
+```bash
+# Open interactive Android root bash shell
+waydroid shell
+
+# Stream live Android system & app logs
+waydroid logcat
+
+# Direct LXC container root shell
+lxc-attach -P /var/lib/waydroid/lxc -n waydroid -- /system/bin/sh
+
+# Filter fatal crash logs / tombstones
+lxc-attach -P /var/lib/waydroid/lxc -n waydroid -- logcat -d -t 200 | grep -iE 'fatal|crash|exception'
+```
 
 ---
 
-## 🌐 6. Network & DNS Troubleshooting
+## 🎮 5. Screen, Resolution & Gaming (User: `vikas`)
+
+*All display properties must be set as regular user `vikas`:*
 
 ```bash
-# 1. Set High-Speed Cloudflare DNS [Regular User]
+# Toggle Fullscreen On / Off (KWin Wayland)
+waydroid-fullscreen
+# (or press Alt + F3 on the window -> More Actions -> Fullscreen)
+
+# Lock 1080p Resolution (1920x1080)
+waydroid prop set persist.waydroid.width 1920
+waydroid prop set persist.waydroid.height 1080
+
+# Dynamic Auto-Resize (Matches window size)
+waydroid prop set persist.waydroid.width 0
+waydroid prop set persist.waydroid.height 0
+
+# Single Tablet Mode (Best for games)
+waydroid prop set persist.waydroid.multi_windows false
+
+# Multi-Window Mode (Each app opens in separate Linux window)
+waydroid prop set persist.waydroid.multi_windows true
+
+# Anti-Freeze / Anti-Sleep (Keeps games running when window loses focus)
+waydroid prop set persist.waydroid.suspend false
+```
+
+---
+
+## 📦 6. App Installation & Management
+
+### 👤 User `vikas` (Regular User):
+```bash
+# Install local APK file
+waydroid app install ~/Downloads/app.apk
+
+# Download & Sideload APK directly
+curl -L -o /tmp/app.apk "<url>" && waydroid app install /tmp/app.apk
+
+# Launch installed app by package name
+waydroid app launch <package_name>
+# Example: waydroid app launch com.apkpure.aegon
+
+# List all installed apps
+waydroid app list
+```
+
+### 👑 Superuser / Root (`root` / `su`):
+```bash
+# Grant app runtime permissions (Storage, Audio, etc.)
+waydroid shell pm grant <package_name> android.permission.RECORD_AUDIO
+waydroid shell pm grant <package_name> android.permission.READ_EXTERNAL_STORAGE
+
+# Force uninstall an app
+waydroid shell pm uninstall <package_name>
+```
+
+---
+
+## 🌐 7. Network, Firewall & DNS Configuration
+
+### 👤 User `vikas` (Set DNS Properties):
+```bash
 waydroid prop set net.dns1 1.1.1.1
 waydroid prop set net.dns2 8.8.8.8
+```
 
-# 2. Fix UFW Firewall Blocking Traffic [Superuser / root]
-sudo ufw default allow FORWARD
-sudo ufw allow in on waydroid0
-sudo ufw allow 53
-sudo ufw reload
+### 👑 Superuser / Root (UFW & IPTABLES NAT Routing):
+```bash
+# Allow UFW routed forwarding and DNS
+ufw default allow FORWARD
+ufw allow in on waydroid0
+ufw allow 53
+ufw reload
 
-# 3. Enable NAT Masquerading [Superuser / root]
-sudo iptables -P FORWARD ACCEPT
-sudo iptables -t nat -A POSTROUTING -s 192.168.240.0/24 -j MASQUERADE
+# Enable NAT masquerade
+iptables -P FORWARD ACCEPT
+iptables -t nat -A POSTROUTING -s 192.168.240.0/24 -j MASQUERADE
 
-# 4. Verify Internet Connectivity inside Container [Superuser / root]
-sudo lxc-attach -P /var/lib/waydroid/lxc -n waydroid -- ping -c 2 1.1.1.1
-sudo lxc-attach -P /var/lib/waydroid/lxc -n waydroid -- ping -c 2 google.com
+# Test connectivity from inside Android container
+lxc-attach -P /var/lib/waydroid/lxc -n waydroid -- ping -c 2 1.1.1.1
+lxc-attach -P /var/lib/waydroid/lxc -n waydroid -- ping -c 2 google.com
 ```
 
 ---
 
-## 📂 7. Storage, Files & OBB Paths
+## 📂 8. Storage, Files & OBB Paths
 
-| Location | Path on Host Linux | Purpose |
-|:---|:---|:---|
-| **Android Internal Storage (`/sdcard`)** | `~/.local/share/waydroid/data/media/0/` | Photos, Downloads, documents accessible from host. |
-| **Game OBB Directory** | `~/.local/share/waydroid/data/media/0/Android/obb/<package_name>/` | Staging large multi-GB game `.obb` asset packs. |
-| **App Private Data** | `~/.local/share/waydroid/data/data/<package_name>/` | App databases, cache, and local files. |
-| **Host Waydroid Images** | `/var/lib/waydroid/images/` | `system.img` and `vendor.img` images. |
-| **Host Container Config** | `/var/lib/waydroid/waydroid.cfg` | Hardware, binder, and suspend configurations. |
+| Location | Path on Host Linux | Accessible By | Purpose |
+|:---|:---|:---|:---|
+| **Android Storage (`/sdcard`)** | `~/.local/share/waydroid/data/media/0/` | `vikas` (User) | Photos, Downloads, documents |
+| **Game OBB Directory** | `~/.local/share/waydroid/data/media/0/Android/obb/<pkg>/` | `vikas` (User) | 2GB+ Game `.obb` assets |
+| **App Private Data** | `~/.local/share/waydroid/data/data/<pkg>/` | `vikas` / `root` | App data, database, cache |
+| **Host System Images** | `/var/lib/waydroid/images/` | `root` only | `system.img` & `vendor.img` |
+| **Container Config** | `/var/lib/waydroid/waydroid.cfg` | `root` only | Core hardware & binder configs |
 
 ---
 
-## 🚀 8. Recommended Shell Aliases (Add to `~/.bashrc`)
+## 🛠️ 9. 1-Click Auto Repair Script (Superuser / Root)
 
+*Run this if Waydroid container fails to start or binder is broken:*
 ```bash
-# --- Waydroid Operational Aliases ---
-alias wd-start="sudo systemctl start waydroid-container && waydroid session start & sleep 2 && waydroid show-full-ui &"
-alias wd-stop="waydroid session stop && sudo systemctl stop waydroid-container"
-alias wd-restart="sudo systemctl restart waydroid-container.service && sleep 2 && waydroid session start &"
-alias wd-ui="waydroid show-full-ui &"
-alias wd-status="waydroid status"
-alias wd-shell="sudo waydroid shell"
-alias wd-log="sudo waydroid logcat"
-alias wd-fullscreen="waydroid-fullscreen"
-alias wd-1080p="waydroid prop set persist.waydroid.width 1920 && waydroid prop set persist.waydroid.height 1080"
+# As Superuser / Root:
+python3 /home/vikas/waydroid-arch-playbook/scripts/auto_fix_waydroid.py
 ```

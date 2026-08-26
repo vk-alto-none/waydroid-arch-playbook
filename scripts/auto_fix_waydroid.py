@@ -94,6 +94,37 @@ z /dev/binderfs/* 0666 root root -
     run_cmd("ln -sf /dev/binderfs/anbox-vndbinder /dev/anbox-vndbinder", check=False)
     run_cmd("ln -sf /dev/binderfs/anbox-hwbinder /dev/anbox-hwbinder", check=False)
 
+def fix_network_and_firewall():
+    print("[*] Configuring Waydroid Network, DNS, and UFW Firewall...")
+    # 1. Force waydroid-net.sh to use standard iptables instead of conflicting nftables
+    net_sh = "/usr/lib/waydroid/data/scripts/waydroid-net.sh"
+    if os.path.exists(net_sh):
+        with open(net_sh, "r") as f:
+            net_code = f.read()
+        net_code = net_code.replace('LXC_USE_NFT="true"', 'LXC_USE_NFT="false"')
+        with open(net_sh, "w") as f:
+            f.write(net_code)
+        print("[+] Set LXC_USE_NFT=false in waydroid-net.sh")
+
+    # 2. Configure UFW if installed and active
+    if shutil.which("ufw"):
+        run_cmd("sed -i 's/DEFAULT_FORWARD_POLICY=\"DROP\"/DEFAULT_FORWARD_POLICY=\"ACCEPT\"/g' /etc/default/ufw", check=False)
+        run_cmd("ufw default allow FORWARD", check=False)
+        run_cmd("ufw allow in on waydroid0", check=False)
+        run_cmd("ufw allow 53", check=False)
+        run_cmd("ufw allow 67/udp", check=False)
+        run_cmd("ufw allow 68/udp", check=False)
+        run_cmd("ufw reload", check=False)
+        print("[+] UFW routed forwarding and DNS rules applied")
+
+    # 3. Ensure iptables NAT & forwarding
+    run_cmd("iptables -P FORWARD ACCEPT", check=False)
+    run_cmd("iptables -t nat -C POSTROUTING -s 192.168.240.0/24 -j MASQUERADE 2>/dev/null || iptables -t nat -A POSTROUTING -s 192.168.240.0/24 -j MASQUERADE", check=False)
+
+    # 4. Anti-suspend & Cloudflare DNS
+    run_cmd("sysctl -w net.ipv4.ip_forward=1", check=False)
+    run_cmd("sed -i 's/suspend_action = freeze/suspend_action = none/g' /var/lib/waydroid/waydroid.cfg 2>/dev/null || true", check=False)
+
 def main():
     if os.geteuid() != 0:
         print("[-] This repair script must be executed with sudo / root privileges.")
@@ -103,6 +134,7 @@ def main():
     patch_lxc_helper()
     patch_lxc_configs()
     setup_binder_rules()
+    fix_network_and_firewall()
 
     # Restart service
     run_cmd("systemctl restart waydroid-container.service")

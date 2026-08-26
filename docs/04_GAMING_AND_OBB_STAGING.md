@@ -55,3 +55,27 @@ If you download `.xapk` or `.zip` manually:
 mkdir -p ~/.local/share/waydroid/data/media/0/Android/obb/<package_name>/
 cp main.*.obb ~/.local/share/waydroid/data/media/0/Android/obb/<package_name>/
 ```
+
+---
+
+## 5. Fullscreen & Quick Exit Controls (KDE Plasma & Wayland)
+
+### 🖥️ Full Screen Toggle:
+Because Wayland surfaces may not respond to generic `F11` keys, use the KWin D-Bus helper script:
+```bash
+# Toggle fullscreen mode instantly
+waydroid-fullscreen
+
+# Or via KDE Plasma Window menu:
+# Press Alt + F3 on the window -> More Actions -> Fullscreen
+```
+
+### 🚪 Clean Exit & Shutdown:
+```bash
+# 1. Close active session:
+waydroid-exit
+# (or press Alt + F4 on the Waydroid window)
+
+# 2. Stop container background service:
+sudo systemctl stop waydroid-container.service
+```

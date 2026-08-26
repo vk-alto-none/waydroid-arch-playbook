@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+import subprocess, re, tempfile
+
+js_code = '''
+var clients = workspace.windowList();
+for (var i = 0; i < clients.length; i++) {
+    var c = clients[i];
+    if (c.resourceClass.toLowerCase().indexOf('waydroid') !== -1 || c.caption.toLowerCase().indexOf('waydroid') !== -1) {
+        c.fullScreen = !c.fullScreen;
+    }
+}
+'''
+with tempfile.NamedTemporaryFile(mode='w', suffix='.js', delete=False) as f:
+    f.write(js_code)
+    tmp_path = f.name
+
+cmd = f'dbus-send --print-reply --dest=org.kde.KWin /Scripting org.kde.kwin.Scripting.loadScript string:"{tmp_path}"'
+res = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+match = re.search(r'int32\s+(\d+)', res.stdout)
+if match:
+    sid = match.group(1)
+    subprocess.run(f'dbus-send --dest=org.kde.KWin /{sid} org.kde.kwin.Script.run', shell=True)
+    subprocess.run(f'dbus-send --dest=org.kde.KWin /{sid} org.kde.kwin.Script.stop', shell=True)
+    print("✅ Waydroid Full Screen toggled!")

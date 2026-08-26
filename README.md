@@ -20,6 +20,10 @@ waydroid session start &
 waydroid show-full-ui &
 ```
 
+### ⚡ Quick CLI Controls (Included in Repo):
+- **Toggle Fullscreen:** `waydroid-fullscreen` (or `Alt + F3` -> More Actions -> Fullscreen)
+- **Clean Exit:** `waydroid-exit` (or `Alt + F4` on window)
+
 ---
 
 ## 📑 Documentation Index

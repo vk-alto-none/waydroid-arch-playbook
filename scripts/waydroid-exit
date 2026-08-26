@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+echo "🛑 Stopping Waydroid session..."
+waydroid session stop
+echo "✅ Waydroid closed successfully!"
